@@ -4,6 +4,8 @@ import time
 import cv2
 import sys
 import os
+from picamera2 import Picamera2
+#import keyboard
 
 sys.path.append('Module-1')
 from new_voice import *
@@ -49,12 +51,16 @@ def run_ocr(frame, result_queue):
 
 def cam():
     global mode, caption_thread_active, recognize_thread_active, ocr_thread_active
-    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture(0)
+    cam = Picamera2()
 
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+        #ret, frame = cap.read()
+        cam.start()
+        frame = cam.capture_array()
+        cam.stop()
+        #if not ret:
+            #break
 
         if not caption_result_queue.empty():
             caption_text = caption_result_queue.get()
@@ -84,48 +90,50 @@ def cam():
 
         if mode == 0:
             print('.', end='', flush=True)
+        elif(mode==1):
+            #voice(caption_this_image(nm))
+            print("-----------------------------------------")
+            print(caption(frame))
+            print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+            mode = 0
+        elif(mode==2):
+            recognise(nm)
+            mode = 0
+        elif(mode==3):
+            ocr(nm)
+            mode = 0
 
-        elif mode == 1:
-            print(1)
-            if not caption_thread_active:
-                threading.Thread(
-                    target=run_caption,
-                    args=(frame.copy(), caption_result_queue),
-                    daemon=True
-                ).start()
-                mode = 0
+        #cv2.imshow("frame", frame)
 
-        elif mode == 2:
-            print(2)
-            if not recognize_thread_active:
-                threading.Thread(
-                    target=run_recognize,
-                    args=(frame.copy(), recognize_result_queue),
-                    daemon=True
-                ).start()
-
-        elif mode == 3:
-            print(3)
-            if not ocr_thread_active:
-                threading.Thread(
-                    target=run_ocr,
-                    args=(frame.copy(), ocr_result_queue),
-                    daemon=True
-                ).start()
-                mode = 0
-
-        cv2.imshow("frame", frame)
-
-        key = cv2.waitKey(1)
-        if key == 49:  # '1'
+        #key = cv2.waitKey(1)
+        #if key == 49:  # '1'
+            #mode = 1
+        #elif key == 50:  # '2'
+            #mode = 2
+        #elif key == 51:  # '3'
+            #mode = 3
+        #elif key == 27:  # ESC
+            #break
+        
+        #if keyboard.is_pressed('1'):
+            #mode = 1
+        #elif keyboard.is_pressed('2'):
+            #mode = 2
+        #elif keyboard.is_pressed('3'):
+            #mode = 3
+        #elif keyboard.is_pressed('esc'):
+            #break
+            
+        key = input("1, 2, 3 or q: ")
+        if key == '1':
             mode = 1
-        elif key == 50:  # '2'
+        elif key == '2':
             mode = 2
-        elif key == 51:  # '3'
+        elif key == '3':
             mode = 3
-        elif key == 27:  # ESC
+        elif key == 'q':
             break
-
+        
     cap.release()
     cv2.destroyAllWindows()
 
