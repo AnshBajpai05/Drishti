@@ -126,7 +126,6 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         and transcript != last_trigger_phrase
         and (current_time - last_trigger_time > TRIGGER_COOLDOWN)
     ):
-    #if "detect object" in transcript:
         last_trigger_time = current_time
         last_trigger_phrase = transcript  # Save to prevent repeat
         picam2.start()
