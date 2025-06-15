@@ -53,17 +53,6 @@ model = YOLO('yolov8n.pt')
 
 def on_begin(self: Type[StreamingClient], event: BeginEvent):
     print(f"Session started: {event.id}")
-
-
-# ~ def on_turn(self: Type[StreamingClient], event: TurnEvent):
-    # ~ print(f"{event.transcript} ({event.end_of_turn})")
-
-    # ~ if event.end_of_turn and not event.turn_is_formatted:
-        # ~ params = StreamingSessionParameters(
-            # ~ format_turns=True,
-        # ~ )
-
-        # ~ self.set_params(params)
         
 def on_turn(self: Type[StreamingClient], event: TurnEvent):
     global last_trigger_time
@@ -75,11 +64,6 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
 
     current_time = time.time()
 
-    # Trigger only if:
-    # - Phrase is in transcript
-    # - It's the end of the user's speech
-    # - It's not the same phrase again
-    # - Enough time has passed (cooldown)
     if (
         trigger_phrase in transcript
         and event.end_of_turn
