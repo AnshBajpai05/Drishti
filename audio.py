@@ -60,7 +60,7 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
     transcript = event.transcript.lower()
     print(f"{transcript} ({event.end_of_turn})")
 
-    trigger_phrase = "hello pineapple"
+    trigger_phrase = "what is in front of me"
 
     current_time = time.time()
 
