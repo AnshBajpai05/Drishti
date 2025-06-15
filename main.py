@@ -22,7 +22,7 @@ from assemblyai.streaming.v3 import (
     TerminationEvent,
     TurnEvent,
 )
-from us2 import run_distance
+from ultrasonic import run_distance
 
 sys.path.append('Module-1')
 from new_voice import *
