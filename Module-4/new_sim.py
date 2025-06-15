@@ -76,8 +76,9 @@ def recognise(frame):
     for (x, y, w, h) in faces:
         roi = gray[y:y+h, x:x+w]
         id_, confidence = recognizer.predict(roi)
+        print("--------Confidence:", confidence)
 
-        if 100 <confidence < 120:
+        if 100 <confidence:
             name = labels.get(id_, "Unknown")
             return name
         else:

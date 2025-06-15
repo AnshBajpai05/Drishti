@@ -73,7 +73,7 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         last_trigger_time = current_time
         last_trigger_phrase = transcript  # Save to prevent repeat
 
-        print("--------------Trigger phrase detected. Capturing image...")
+        print("--------------Trigger phrase detected. Capturing image...----------------")
 
         picam2.start()
         frame = picam2.capture_array()
@@ -109,8 +109,10 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         
             cv2.imwrite(f"{folder_path}/{count}.jpg", frame)
             print(f"Image saved at: {folder_path}")
+            train_faces()
             
     if "read this" in transcript:
+        print("--------------Trigger phrase detected. Capturing image...----------------")
         picam2.start()
         frame = picam2.capture_array()
         picam2.stop()
@@ -126,6 +128,7 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         and transcript != last_trigger_phrase
         and (current_time - last_trigger_time > TRIGGER_COOLDOWN)
     ):
+        print("--------------Trigger phrase detected. Capturing image...----------------")
         last_trigger_time = current_time
         last_trigger_phrase = transcript  # Save to prevent repeat
         picam2.start()
@@ -142,6 +145,21 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
             voice("I could not detect anything")
         #print("-----Yolo ------:",yolo_out)
 		
+    if (
+        "who is this" in transcript
+        and event.end_of_turn
+        and transcript != last_trigger_phrase
+        and (current_time - last_trigger_time > TRIGGER_COOLDOWN)
+    ):
+        print("--------------Trigger phrase detected. Capturing image...----------------")
+        last_trigger_time = current_time
+        last_trigger_phrase = transcript  # Save to prevent repeat
+        picam2.start()
+        frame = picam2.capture_array()
+        picam2.stop()
+        rec_out = recognise(frame)
+        print("------Recognized: ", rec_out)
+        voice(rec_out)
         
 
     if event.end_of_turn and not event.turn_is_formatted:
