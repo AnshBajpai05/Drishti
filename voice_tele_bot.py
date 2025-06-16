@@ -5,8 +5,8 @@ from telegram import Bot, Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes, CommandHandler
 
 BOT_TOKEN = '7626871646:AAFGR4hRxDZwCy5T1Jljnao5Y4ry74eMnec' 
-AUTHORIZED_USERS = [6319776029, 1601891927] #both are mine currently (2 accounts)
-CAREGIVER_CHAT_ID = 1601891927  
+AUTHORIZED_USERS = [631******9, 160******7] #both are mine currently (2 accounts)
+CAREGIVER_CHAT_ID = 160******27  
 
 bot = Bot(token=BOT_TOKEN)
 logging.basicConfig(level=logging.INFO)
