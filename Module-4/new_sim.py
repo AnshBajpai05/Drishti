@@ -78,7 +78,7 @@ def recognise(frame):
         id_, confidence = recognizer.predict(roi)
         print("--------Confidence:", confidence)
 
-        if 100 <confidence:
+        if 40 <confidence:
             name = labels.get(id_, "Unknown")
             return name
         else:

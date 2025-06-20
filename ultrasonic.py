@@ -18,3 +18,4 @@ def run_distance():
             sleep(1)
             vibrator.off()
             sleep(5)
+#run_distance()

@@ -78,12 +78,18 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         picam2.start()
         frame = picam2.capture_array()
         picam2.stop()
-
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        
         cap = caption(frame)
         print("--------Caption:", cap)
         voice(cap)
         
-    if "capture image of" in transcript:
+    if (
+        "capture image of" in transcript
+        and event.end_of_turn
+        and transcript != last_trigger_phrase
+        and (current_time - last_trigger_time > TRIGGER_COOLDOWN)
+    ):
         print("--------------Trigger phrase detected. Capturing image...----------------")
         
         name = ""
@@ -106,21 +112,38 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
             picam2.start()
             frame = picam2.capture_array()
             picam2.stop()
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
         
             cv2.imwrite(f"{folder_path}/{count}.jpg", frame)
             print(f"Image saved at: {folder_path}")
             train_faces()
-            
-    if "read this" in transcript:
+        
+    if (
+        "read this" in transcript
+        and event.end_of_turn
+        and transcript != last_trigger_phrase
+        and (current_time - last_trigger_time > TRIGGER_COOLDOWN)
+    ):
+        last_trigger_time = current_time
+        last_trigger_phrase = transcript
         print("--------------Trigger phrase detected. Capturing image...----------------")
         picam2.start()
         frame = picam2.capture_array()
         picam2.stop()
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         ocr_out = ocr(frame)
-        print("----OCR out:", ocr_out)
-        #if len(ocr_out) != 0:
-			#for i in ocr_out:
-				#voice(i)
+        #ocr_out = mmocr(frame)
+        print("----OCR------------\n")
+        #print(ocr_out)
+        
+        if ocr_out:
+            for _,text,conf in ocr_out:
+                print("\n\n",text,"   ",conf)
+                if conf>0.2:
+                    print(text)
+                    voice(text)
         
     if (
         "detect object" in transcript
@@ -134,6 +157,7 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         picam2.start()
         frame = picam2.capture_array()
         picam2.stop()
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
         #print(frame.shape)
         yolo_out = model(frame[:,:,:3])
         class_ids = yolo_out[0].boxes.cls.cpu().numpy().astype(int)
@@ -157,6 +181,9 @@ def on_turn(self: Type[StreamingClient], event: TurnEvent):
         picam2.start()
         frame = picam2.capture_array()
         picam2.stop()
+        frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
         rec_out = recognise(frame)
         print("------Recognized: ", rec_out)
         voice(rec_out)
@@ -185,7 +212,7 @@ def main():
             api_host="streaming.assemblyai.com",
         )
     )
-
+    voice("  Hello, I am Drishti, How may I help you")
     client.on(StreamingEvents.Begin, on_begin)
     client.on(StreamingEvents.Turn, on_turn)
     client.on(StreamingEvents.Termination, on_terminated)

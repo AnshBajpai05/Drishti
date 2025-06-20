@@ -12,3 +12,4 @@ def caption(frame):
     out = model.generate(**inputs)
     caption = processor.decode(out[0], skip_special_tokens=True)
     return caption
+
